@@ -8,7 +8,7 @@ import sys
 import pandas as pd
 import websockets
 
-sys.path.append(r"C:\Users\cheng\deribit\scripts")
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import local_directory as loc_dir
 
 # Import API Key from Deribit

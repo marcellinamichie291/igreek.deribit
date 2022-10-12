@@ -1,13 +1,14 @@
 import os
 
-homedrive = os.environ['HOMEDRIVE']
-homepath = os.environ['HOMEPATH']
-drive = r"C:\Users\cheng\deribit"
+# homedrive = os.environ['HOMEDRIVE']
+# homepath = os.environ['HOMEPATH']
+drive = os.path.dirname(os.path.dirname(__file__))
 
-desktop = os.path.join(homedrive, homepath, "Desktop")
+# desktop = os.path.join(homedrive, homepath, "Desktop")
 # onedrive = os.path.join(onedrive, "backup", "Desktop")
 
-scripts_main = os.path.join(homedrive, homepath, "deribit", "scripts")
+# scripts_main = os.path.join(homedrive, homepath, "deribit", "scripts")
+scripts_main = os.path.join(drive, 'scripts')
 auto_main = os.path.join(scripts_main,"automations")
 config_main = os.path.join(scripts_main, "proc_config")
 data_proc_main = os.path.join(scripts_main, "data_process")

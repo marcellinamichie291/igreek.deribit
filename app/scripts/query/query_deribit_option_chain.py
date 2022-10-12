@@ -9,12 +9,17 @@ import pandas as pd
 import websockets
 from dateutil import parser
 
-sys.path.append(r"C:\Users\cheng\deribit\scripts")
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import local_directory as loc_dir
 
 # sys.path.append(loc_dir.config_main)
 from query_deribit import get_index_price
 from implied_volatility import find_iv
+
+"""module <proc_config>"""
+sys.path.append(loc_dir.config_main)
+from db_config import get_db_connection
+
 
 class DeribitOptionsData:
 
@@ -160,17 +165,20 @@ class DeribitOptionsData:
         df['iv_mark'] = find_iv(df.usd_mark, df.underlying_price, df.strike, df.time_to_expiry, df.interest_rate, df.type, 0).IV.to_numpy()
 
         # Calculate APY
-        df['apy_bid'] = df['usd_bid'] / (df['strike'] * df['time_to_expiry'])
-        df['apy_ask'] = df['usd_ask'] / (df['strike'] * df['time_to_expiry'])
-        df['apy_mid'] = df['usd_mid'] / (df['strike'] * df['time_to_expiry'])
-        df['apy_mark'] = df['usd_mark'] / (df['strike'] * df['time_to_expiry'])
+        df['apy_bid'] = df['usd_bid'] / (df['spot_usd_price'] * df['time_to_expiry'])
+        df['apy_ask'] = df['usd_ask'] / (df['spot_usd_price'] * df['time_to_expiry'])
+        df['apy_mid'] = df['usd_mid'] / (df['spot_usd_price'] * df['time_to_expiry'])
+        df['apy_mark'] = df['usd_mark'] / (df['spot_usd_price'] * df['time_to_expiry'])
+
+        # Calculate premium
+        df['premium'] = df.bid_price * df.spot_usd_price
 
         # Remove multiple columns
         removed_cols = ['underlying_index', 'price_change', 'interest_rate', 'estimated_delivery_price', 'spot_usd_time', 'creation_timestamp']
         df = df.drop(removed_cols, axis=1)
 
         # Reorder columns
-        column_names = ['utc_ts', 'utc_dt', 'spot_usd_price', 'instrument_name', 'quote_currency', 'base_currency', 'volume', 'open_interest', 'type', 'strike', 'underlying_price', 'expiry', 'time_to_expiry', 'low', 'high', 'last', 'bid_price', 'ask_price', 'mid_price', 'mark_price', 'usd_bid', 'usd_ask', 'usd_mid', 'usd_mark', 'iv_bid', 'iv_ask', 'iv_mid', 'iv_mark', 'apy_bid', 'apy_ask', 'apy_mid', 'apy_mark']
+        column_names = ['utc_ts', 'utc_dt', 'spot_usd_price', 'instrument_name', 'quote_currency', 'base_currency', 'volume', 'open_interest', 'type', 'strike', 'underlying_price', 'expiry', 'time_to_expiry', 'low', 'high', 'last', 'bid_price', 'ask_price', 'mid_price', 'mark_price', 'usd_bid', 'usd_ask', 'usd_mid', 'usd_mark', 'iv_bid', 'iv_ask', 'iv_mid', 'iv_mark', 'apy_bid', 'apy_ask', 'apy_mid', 'apy_mark', 'premium']
         df = df.reindex(columns = column_names)
 
         # Sort by type, expiry, strike
@@ -282,3 +290,23 @@ class DeribitOptionsData:
         self._log.write(f"\n{self.instrument} option chain saved to ... " + \
                         f"\n[Path]: {path}" + f"\n[Filename]: {filename}")
 
+    def save_db(self):
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            df1 = self.options.copy()
+            keys = df1.columns.to_list()
+            stmt_key = ", ".join(keys)
+            stmt_val = ", ".join(["%s" for i in keys])
+            stmt = f"REPLACE INTO dual_investment_data_deribit ({stmt_key}) VALUES ({stmt_val})"
+            df1['utc_ts'] = pd.to_datetime(df1['utc_ts'], unit='s').dt.strftime('%Y-%m-%d %H:%M:%S')
+            df1['utc_dt'] = pd.to_datetime(df1['utc_dt'], unit='s').dt.strftime('%Y-%m-%d %H:%M:%S')
+            df1['expiry'] = pd.to_datetime(df1['expiry'], unit='s').dt.strftime('%Y-%m-%d %H:%M:%S')
+            df1['expiry'] = df1['expiry'].fillna('1970-01-01 00:00:00')
+            df1 = df1.fillna(0)
+            cur.executemany(stmt, df1.values.tolist())
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(e)
+            self._log.write(f"\n{e}")

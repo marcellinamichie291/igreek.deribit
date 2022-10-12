@@ -5,7 +5,7 @@ import sys
 
 import pandas as pd
 
-sys.path.append(r"C:\Users\cheng\deribit\scripts")
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import local_directory as loc_dir
 
 """module <proc_config>"""
@@ -44,6 +44,7 @@ def update_option_chain(instruments: list, log: str):
                 log_file.write(f"\n\n============================================ {dt.datetime.now()} {inst} ============================================")
                 option_obj = dbt_option(inst, log_file=log_file)
                 option_obj.save_csv()
+                option_obj.save_db()
                 status = "Success"
         except:
             ex_type, ex_value, ex_traceback = sys.exc_info()
