@@ -1,0 +1,3 @@
+@echo off
+"C:\Users\admin\AppData\Local\Programs\Python\Python38\python.exe" "C:\Users\admin\Desktop\ardgo-am-python\scripts\automations\auto_data_processing_deribit_option_chain.py"
+pause
