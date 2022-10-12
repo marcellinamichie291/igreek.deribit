@@ -1,0 +1,8 @@
+1. build docker image
+
+docker build -t igreek/deribit:3.7 .
+
+2. crontab
+
+30 8 * * * docker run --name igreek_deribit --rm -t -v ~/PycharmProjects/igreek.deribit/app:/app igreek/deribit:3.7 /app/scripts/automations/auto_data_query_deribit_option_chain.py >> ~/PycharmProjects/igreek.deribit/log/igreek_deribit_`date +\%Y\%m\%d_\%H\%M\%S`.log 2>&1
+29 8 * * * docker stop igreek_deribit >> ~/PycharmProjects/igreek.deribit/log/igreek_deribit_close_`date +\%Y\%m\%d_\%H\%M\%S`.log 2>&1
