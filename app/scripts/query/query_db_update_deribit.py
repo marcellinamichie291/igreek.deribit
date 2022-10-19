@@ -43,7 +43,7 @@ def update_option_chain(instruments: list, log: str):
             for inst in instruments:
                 log_file.write(f"\n\n============================================ {dt.datetime.now()} {inst} ============================================")
                 option_obj = dbt_option(inst, log_file=log_file)
-                option_obj.save_csv()
+                # option_obj.save_csv()
                 option_obj.save_db()
                 status = "Success"
         except:
