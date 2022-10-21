@@ -21,6 +21,9 @@ TDY = dt.date.today()
 TDY_SETTLE = dt.datetime(TDY.year, TDY.month, TDY.day, 16, 0, 0)
 
 def update_option_chain(instruments: list, log: str):
+    if not os.path.exists(log):
+        with open(log, 'w+'):
+            pass
 
     with open(log, 'r') as f:
         lines = f.readlines()
