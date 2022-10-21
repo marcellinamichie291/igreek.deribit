@@ -15,6 +15,6 @@ if __name__ == '__main__':
         try:
             filepath = os.path.join(loc_dir.drive, "database", f"dbt_option_chain_query_log_{cur_time}.txt")
             query_db_update_deribit.update_option_chain(instruments=["ETH", "BTC"], log=filepath)
-            time.sleep(10)
+            time.sleep(5)
         except Exception as e:
             print(e)

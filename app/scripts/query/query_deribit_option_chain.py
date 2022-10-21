@@ -174,11 +174,11 @@ class DeribitOptionsData:
         df['premium'] = df.bid_price * df.spot_usd_price
 
         # Remove multiple columns
-        removed_cols = ['underlying_index', 'price_change', 'interest_rate', 'estimated_delivery_price', 'spot_usd_time', 'creation_timestamp']
+        removed_cols = ['underlying_index', 'price_change', 'estimated_delivery_price', 'spot_usd_time', 'creation_timestamp']
         df = df.drop(removed_cols, axis=1)
 
         # Reorder columns
-        column_names = ['utc_ts', 'utc_dt', 'spot_usd_price', 'instrument_name', 'quote_currency', 'base_currency', 'volume', 'open_interest', 'type', 'strike', 'underlying_price', 'expiry', 'time_to_expiry', 'low', 'high', 'last', 'bid_price', 'ask_price', 'mid_price', 'mark_price', 'usd_bid', 'usd_ask', 'usd_mid', 'usd_mark', 'iv_bid', 'iv_ask', 'iv_mid', 'iv_mark', 'apy_bid', 'apy_ask', 'apy_mid', 'apy_mark', 'premium']
+        column_names = ['utc_ts', 'utc_dt', 'spot_usd_price', 'instrument_name', 'quote_currency', 'base_currency', 'volume', 'open_interest', 'type', 'strike', 'underlying_price', 'expiry', 'time_to_expiry', 'low', 'high', 'last', 'bid_price', 'ask_price', 'mid_price', 'mark_price', 'usd_bid', 'usd_ask', 'usd_mid', 'usd_mark', 'iv_bid', 'iv_ask', 'iv_mid', 'iv_mark', 'apy_bid', 'apy_ask', 'apy_mid', 'apy_mark', 'premium', 'interest_rate']
         df = df.reindex(columns = column_names)
 
         # Sort by type, expiry, strike
