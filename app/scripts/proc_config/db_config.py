@@ -10,7 +10,6 @@ def get_db_connection():
             database="igreek",
         )
         if _conn.is_connected():
-            print("MySQL Connected")
             return _conn
         else:
             print("MySQL Not connected")
